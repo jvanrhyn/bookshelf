@@ -82,4 +82,4 @@ MIT License
 
 ## Contact
 
-[Johan van Rhyn](johan@squarehole.dev)
+[Johan van Rhyn](https://squarehole.dev)

@@ -16,6 +16,8 @@ func StartAndServe() error {
 	app := fiber.New()
 	app.Use(slogfiber.New(logger))
 
+	createGroups(app)
+
 	err := app.Listen(":" + port)
 	if err != nil {
 		go slog.Error("Error starting server", "error", err)
@@ -23,6 +25,10 @@ func StartAndServe() error {
 	}
 
 	return nil
+}
+
+func createGroups(app *fiber.App) {
+	registerBookEndPoints(app)
 }
 
 func Shutdown() {

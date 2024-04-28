@@ -30,6 +30,14 @@ func registerBookEndPoints(app *fiber.App) {
 }
 
 func deleteBook(ctx *fiber.Ctx) error {
+
+	id, err := getIdFromContext(ctx)
+	if err != nil {
+		slog.Error(err.Error())
+		return err
+	}
+
+	slog.Info("Deleting book", "id", id)
 	return nil
 }
 
@@ -56,17 +64,24 @@ func getBookByISBN(ctx *fiber.Ctx) error {
 // The function takes a *fiber.Ctx object as its argument which represents the context of the request.
 func getBookById(ctx *fiber.Ctx) error {
 
+	id, err := getIdFromContext(ctx)
+	err = ctx.Status(fiber.StatusOK).JSON(id)
+	if err != nil {
+		slog.Error(err.Error())
+	}
+
+	return nil
+}
+
+func getIdFromContext(ctx *fiber.Ctx) (int, error) {
 	idStr := ctx.Params("id")
 	if idStr != "" {
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			slog.Error(err.Error(), "idStr", idStr)
-			return err
+			return 0, err
 		}
-		err = ctx.Status(fiber.StatusOK).JSON(id)
-		if err != nil {
-			slog.Error(err.Error())
-		}
+		return id, nil
 	}
-	return nil
+	return 0, nil
 }

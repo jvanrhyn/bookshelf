@@ -45,6 +45,15 @@ func getBookByISBN(ctx *fiber.Ctx) error {
 	return nil
 }
 
+// getBookById is a function that is used as a handler for the GET "/:id" route.
+// It attempts to get a book's information based on its ID from the request parameters.
+// If the ID is not empty and can be parsed to an integer, the function responds with the ID in JSON format.
+// If an error occurs during the parsing, the error is logged and returned.
+// If an error occurs while responding with JSON, the error is logged.
+// This function is expected to be used in a context where the router makes sure the ID parameter exists.
+// It returns an error that represents how the function execution went.
+//
+// The function takes a *fiber.Ctx object as its argument which represents the context of the request.
 func getBookById(ctx *fiber.Ctx) error {
 
 	idStr := ctx.Params("id")

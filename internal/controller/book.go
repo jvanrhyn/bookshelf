@@ -6,6 +6,19 @@ import (
 	"strconv"
 )
 
+// registerBookEndPoints sets up the routes for the book-related endpoints.
+//
+// This function takes a fiber.App object as argument and uses it
+// to define the group of routes prefixed with "books/".
+//
+// The following endpoints are registered in this function:
+// - GET "/:id" that maps to the getBookById function,
+// - GET "/isbn/:isbn" that maps to the getBookByISBN function,
+// - POST "/" that maps to the createBook function,
+// - PUT "/:id" that maps to the updateBook function,
+// - DELETE "/:id" that maps to the deleteBook function.
+//
+// It does not return any values.
 func registerBookEndPoints(app *fiber.App) {
 	books := app.Group("books/")
 

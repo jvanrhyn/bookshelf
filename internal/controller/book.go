@@ -1,6 +1,10 @@
 package controller
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+	"log/slog"
+	"strconv"
+)
 
 func registerBookEndPoints(app *fiber.App) {
 	books := app.Group("books/")
@@ -29,5 +33,18 @@ func getBookByISBN(ctx *fiber.Ctx) error {
 }
 
 func getBookById(ctx *fiber.Ctx) error {
+
+	idStr := ctx.Params("id")
+	if idStr != "" {
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			slog.Error(err.Error(), "idStr", idStr)
+			return err
+		}
+		err = ctx.Status(fiber.StatusOK).JSON(id)
+		if err != nil {
+			slog.Error(err.Error())
+		}
+	}
 	return nil
 }

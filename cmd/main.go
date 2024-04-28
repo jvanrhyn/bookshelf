@@ -9,13 +9,21 @@ import (
 	"log/slog"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
 
+/*
+init is a special function; it's called automatically when the package is imported.
+In this function, the environment variables are loaded from a .env file using the godotenv package.
+If the loading fails, it checks for a custom .env file path using the GetEnvFilePath function from the api package.
+If the custom loading fails too, it panics and the application will stop, printing the error message.
+In regular use, the function does not require any arguments or returns any values.
+Panic in Go is equivalent to exceptions in other languages.
+*/
 func init() {
 
-	// Read Configuration data from the .env file in the project
 	err := godotenv.Load()
 	if err != nil {
 		envPath := api.GetEnvFilePath()
@@ -28,14 +36,44 @@ func init() {
 
 func main() {
 
-	w := os.Stderr
-	handler := log.New(w)
-	handler.SetLevel(log.DebugLevel)
-	handler.SetTimeFormat(time.Kitchen)
-	handler.SetReportTimestamp(true)
+	logTo := os.Getenv("LOG_TO")
+	if logTo == "" {
+		logTo = "console"
+	} else {
+		logTo = strings.ToLower(logTo)
+	}
 
-	slog.SetDefault(slog.New(
-		handler))
+	var opts *slog.HandlerOptions
+	switch logTo {
+	case "console":
+		w := os.Stderr
+		handler := log.New(w)
+		handler.SetLevel(log.DebugLevel)
+		handler.SetTimeFormat(time.Kitchen)
+		handler.SetReportTimestamp(true)
+
+		slog.SetDefault(slog.New(
+			handler))
+	case "json":
+		opts = &slog.HandlerOptions{
+			AddSource: true,
+			Level:     slog.LevelDebug,
+		}
+
+		logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
+		slog.SetDefault(logger)
+
+	default:
+		opts = &slog.HandlerOptions{
+			AddSource: true,
+			Level:     slog.LevelDebug,
+		}
+
+		logger := slog.NewTextHandler(os.Stderr, opts)
+		slog.SetDefault(slog.New(logger))
+		slog.Warn("No value specified for the environment value LOG_TO")
+	}
+
 	slog.Info("Starting the application")
 
 	stop := make(chan os.Signal, 1)

@@ -26,7 +26,7 @@ The Book Library API is a RESTful API built using Go, Fiber, Postgres SQL, and S
 
 - Go 1.19 or higher
 - Postgres SQL 14.2 or higher
-- Auth0 account
+- Auth0 account (to-be-added)
 
 ## Installation
 

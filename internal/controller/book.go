@@ -1,9 +1,12 @@
 package controller
 
 import (
-	"github.com/gofiber/fiber/v2"
 	"log/slog"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/jvanrhyn/bookshelf/internal/database"
+	"github.com/jvanrhyn/bookshelf/internal/model"
 )
 
 // registerBookEndPoints sets up the routes for the book-related endpoints.
@@ -37,7 +40,13 @@ func deleteBook(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	slog.Info("Deleting book", "id", id)
+	err = database.DeleteBook(id)
+	if err != nil {
+		slog.Error(err.Error())
+		return err
+	}
+
+	slog.Info("Deleted book", "id", id)
 	return nil
 }
 
@@ -46,6 +55,21 @@ func updateBook(ctx *fiber.Ctx) error {
 }
 
 func createBook(ctx *fiber.Ctx) error {
+
+	var book *model.Book
+	err := ctx.BodyParser(&book)
+	if err != nil {
+		slog.Error("Failed to parse JSON body", "Error", err)
+		return err
+	}
+	slog.Info("Received book from request", "Book", book)
+
+	err = database.StoreBook(book)
+	if err != nil {
+		slog.Error("Error in database store", "error", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -68,8 +92,19 @@ func getBookById(ctx *fiber.Ctx) error {
 	err = ctx.Status(fiber.StatusOK).JSON(id)
 	if err != nil {
 		slog.Error(err.Error())
+		return err
 	}
 
+	err, book := database.GetBookById(id)
+	if err != nil {
+		slog.Error(err.Error())
+	}
+
+	err = ctx.JSON(book)
+	if err != nil {
+		slog.Error(err.Error(), "Could not marshal book into JSON", book)
+		return err
+	}
 	return nil
 }
 

@@ -10,12 +10,13 @@ import (
 )
 
 var db *gorm.DB
+var err error
 
 func InitDatabase() error {
 	dsn := buildConnectionString()
 	slog.Info("Initializing database", "connection", dsn)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
 
 		NamingStrategy: PostgresNamingStrategy{},
 	})

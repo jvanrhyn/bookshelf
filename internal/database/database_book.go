@@ -47,3 +47,51 @@ func GetBookById(id int) (error, *model.Book) {
 
 	return nil, &book
 }
+
+// UpdateBook updates an existing book in the database.
+//
+// Parameters:
+//   - book: A pointer to the model.Book struct that represents the book to be updated.
+//
+// Returns:
+//   - error: An error if the update fails.
+//
+// Example:
+//
+//	book := &model.Book{ID: 1, Title: "New Title"}
+//	err := database.UpdateBook(book)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//	fmt.Println("Book updated successfully.")
+func UpdateBook(book *model.Book) error {
+
+	err := db.Save(book).Error
+	if err != nil {
+		slog.Error("Error in database update", "error", err)
+		return err
+	}
+
+	return nil
+}
+
+// GetBookByISBN retrieves a book from the database based on its ISBN.
+//
+// Parameters:
+//   - isbn: A string that represents the ISBN of the book to be retrieved.
+//
+// Returns:
+//   - error: An error if the retrieval fails.
+//   - *model.Book: A pointer to the model.Book struct that represents the book retrieved from the database.
+func GetBookByISBN(isbn string) (error, *model.Book) {
+
+	book := model.Book{}
+
+	result := db.First(&book, "isbn = ?", isbn)
+	if result.Error != nil {
+		slog.Error("Error retrieving the book", "error", result.Error)
+		return err, &model.Book{}
+	}
+
+	return nil, &book
+}

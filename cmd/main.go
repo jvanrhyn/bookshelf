@@ -60,8 +60,8 @@ func main() {
 			Level:     slog.LevelDebug,
 		}
 
-		logger := slog.New(slog.NewJSONHandler(os.Stdout, opts))
-		slog.SetDefault(logger)
+		logger := slog.NewJSONHandler(os.Stdout, opts)
+		slog.SetDefault(slog.New(logger))
 
 	default:
 		opts = &slog.HandlerOptions{
